@@ -14,7 +14,7 @@ const QUICK_TECHNIQUES = [
 // Given user's free-text description of what they like within an interest,
 // calls Claude to reorder/recommend the best matching resources from the pool.
 // ─── API client ───────────────────────────────────────────────────────────────
-const API = "http://localhost:8000";
+const API = window.location.origin.includes("localhost") ? "http://localhost:8000" : "";
 function getToken(){ return localStorage.getItem("dx_token") || ""; }
 async function apiFetch(path, opts={}){
   try {
