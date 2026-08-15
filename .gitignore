@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+dist/
+/frontend/node_modules/
+/frontend/dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Databases
+*.db
+deprex.db
+
+# Sensitive credentials & environment configuration
+.env
+frontend/.env
+firebase-credentials.json
+*.pem
+*.key
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Background Agent temp files
+.agents/
+.gemini/
