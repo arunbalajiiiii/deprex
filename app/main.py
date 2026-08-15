@@ -8,7 +8,10 @@ from app.routers import auth, user, journal, assessment, events, ai
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()       # create tables on startup if they don't exist
+    try:
+        await init_db()       # create tables on startup if they don't exist
+    except Exception as e:
+        print(f"[Warning] init_db failed on startup: {e}")
     yield
 
 

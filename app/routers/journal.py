@@ -6,14 +6,12 @@ from google import genai
 from google.genai import types
 import json
 
+import os
 from app.models.database import get_db, User, Journal
 from app.auth import get_current_user
 from app.config import settings
 
 router = APIRouter(prefix="/journal", tags=["journal"])
-
-# Initialize Google GenAI client (resolves key from settings or GEMINI_API_KEY env)
-client = genai.Client(api_key=settings.GEMINI_API_KEY or None)
 
 
 # ── Schemas ────────────────────────────────────────────────────────────────────
@@ -84,6 +82,10 @@ async def get_journals(
 async def _analyse_sentiment(text: str) -> tuple[float, str]:
     """Ask Gemini to score sentiment -1.0 to 1.0 and return (score, label)."""
     try:
+        key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
+        if not key:
+            return 0.0, "neutral"
+        client = genai.Client(api_key=key)
         response = client.models.generate_content(
             model="gemini-3.5-flash",
             contents=f"Analyse the sentiment of this journal entry: {text[:800]}",

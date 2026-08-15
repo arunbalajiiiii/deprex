@@ -6,14 +6,23 @@ from google import genai
 from google.genai import types
 import json
 
+import os
 from app.models.database import get_db, User
 from app.auth import get_current_user
 from app.config import settings
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
-# Initialize Google GenAI client (resolves key from settings or GEMINI_API_KEY env)
-client = genai.Client(api_key=settings.GEMINI_API_KEY or None)
+def _get_gemini_client() -> genai.Client:
+    """Lazy initialize GenAI client so missing key doesn't crash server import."""
+    key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
+    if not key:
+        raise HTTPException(
+            status_code=503,
+            detail="GEMINI_API_KEY is not configured on the server. Please add it to your environment variables."
+        )
+    return genai.Client(api_key=key)
+
 
 
 # ── Schemas ────────────────────────────────────────────────────────────────────
@@ -67,6 +76,7 @@ async def chat(
         contents.append(types.Content(role=role, parts=[types.Part.from_text(text=m.content)]))
 
     try:
+        client = _get_gemini_client()
         response = client.models.generate_content(
             model="gemini-3.5-flash",
             contents=contents,
@@ -108,6 +118,7 @@ async def personalise_resources(
     )
 
     try:
+        client = _get_gemini_client()
         # Use Structured Outputs to guarantee a list of integers
         response = client.models.generate_content(
             model="gemini-3.5-flash",
@@ -178,6 +189,7 @@ async def onboard_chat(body: OnboardRequest):
         contents.append(types.Content(role=role, parts=[types.Part.from_text(text=m.content)]))
 
     try:
+        client = _get_gemini_client()
         response = client.models.generate_content(
             model="gemini-3.5-flash",
             contents=contents,
@@ -231,6 +243,7 @@ async def custom_guide(body: CustomGuideRequest):
         f"and output ONLY the bullet points in plain text/markdown. No introductory or concluding remarks."
     )
     try:
+        client = _get_gemini_client()
         response = client.models.generate_content(
             model="gemini-3.5-flash",
             contents=prompt,
@@ -284,6 +297,7 @@ async def generate_resources(body: GenerateResourcesRequest):
     )
 
     try:
+        client = _get_gemini_client()
         response = client.models.generate_content(
             model="gemini-3.5-flash",
             contents=prompt,
