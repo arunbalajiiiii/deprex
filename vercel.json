@@ -1,65 +1,50 @@
 {
-  "builds": [
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/auth/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "app/main.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/auth/(.*)",
-      "dest": "app/main.py"
+      "source": "/user/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/user/(.*)",
-      "dest": "app/main.py"
+      "source": "/journal/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/journal/(.*)",
-      "dest": "app/main.py"
+      "source": "/assessment/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/assessment/(.*)",
-      "dest": "app/main.py"
+      "source": "/relief-events:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/relief-events(.*)",
-      "dest": "app/main.py"
+      "source": "/chat-events:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/chat-events(.*)",
-      "dest": "app/main.py"
+      "source": "/ai/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/ai/(.*)",
-      "dest": "app/main.py"
+      "source": "/health",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/health",
-      "dest": "app/main.py"
+      "source": "/docs",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/docs",
-      "dest": "app/main.py"
+      "source": "/openapi.json",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/openapi.json",
-      "dest": "app/main.py"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
