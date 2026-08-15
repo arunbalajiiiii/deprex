@@ -5,7 +5,22 @@ from sqlalchemy.sql import func
 from app.config import settings
 
 
-engine = create_async_engine(settings.DATABASE_URL, echo=False)
+def _create_engine():
+    db_url = getattr(settings, "DATABASE_URL", "") or "sqlite+aiosqlite:///./deprex.db"
+    # Auto-convert postgresql url to asyncpg format if needed
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif db_url.startswith("postgresql://") and "+asyncpg" not in db_url:
+        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    elif db_url.startswith("sqlite:///") and "+aiosqlite" not in db_url:
+        db_url = db_url.replace("sqlite:///", "sqlite+aiosqlite:///", 1)
+    return create_async_engine(db_url, echo=False)
+
+try:
+    engine = _create_engine()
+except Exception as e:
+    print(f"[Warning] Failed to initialize primary async engine ({e}). Falling back to in-memory/tmp SQLite.")
+    engine = create_async_engine("sqlite+aiosqlite:////tmp/deprex.db", echo=False)
 
 
 class Base(DeclarativeBase):
