@@ -113,3 +113,25 @@ async def test_chat_message_persistence_and_history(client, companion_user):
 
     assert "calming routine" in last_user_msg["content"]
     assert "CompanionTestUser" in last_assistant_msg["content"]
+
+
+@pytest.mark.asyncio
+async def test_companion_service_error_rollback_on_failure(client, companion_user):
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    # Sending a message containing "simulate_error" causes InMemoryIntelligenceAdapter to raise IntelligenceUnavailableError
+    payload = {"content": "simulate_error trigger failure"}
+    response = await client.post("/ai/chat", json=payload)
+    assert response.status_code == 502
+    assert "Simulated companion service is unavailable" in response.json()["detail"]
+
+    # Verify that no orphaned user message was committed to the database
+    async with AsyncSession(engine) as session:
+        msgs_res = await session.execute(
+            select(ChatMessage)
+            .where(ChatMessage.user_id == companion_user.id)
+            .where(ChatMessage.content.contains("simulate_error"))
+        )
+        orphaned_msgs = msgs_res.scalars().all()
+        assert len(orphaned_msgs) == 0
+
