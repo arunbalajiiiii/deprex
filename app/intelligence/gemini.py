@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Optional
 from google import genai
@@ -24,19 +25,20 @@ class GeminiAdapter(IntelligenceProvider):
         self.model = model
 
     async def _generate_with_fallback(self, **kwargs):
-        candidates = [self.model] + [m for m in ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"] if m != self.model]
+        # Candidates list prioritizing tested active Gemini 3.x Flash models
+        fallback_models = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.7-flash", "gemini-3-flash-preview"]
+        candidates = [self.model] + [m for m in fallback_models if m != self.model]
         last_error = None
+
         for m in candidates:
-            try:
-                kwargs["model"] = m
-                return await self.client.aio.models.generate_content(**kwargs)
-            except Exception as e:
-                last_error = e
-                err_msg = str(e).lower()
-                if "404" in err_msg or "not found" in err_msg or "no longer available" in err_msg:
-                    logger.warning("Gemini model %s unavailable, trying next candidate: %s", m, e)
-                    continue
-                raise
+            for attempt in range(2):
+                try:
+                    kwargs["model"] = m
+                    return await self.client.aio.models.generate_content(**kwargs)
+                except Exception as e:
+                    last_error = e
+                    logger.warning("Gemini model %s (attempt %d/2) failed: %s", m, attempt + 1, e)
+                    await asyncio.sleep(0.5)
         raise last_error
 
     async def generate_companion_reply(
@@ -82,13 +84,16 @@ class GeminiAdapter(IntelligenceProvider):
                 contents=formatted_contents,
                 config=types.GenerateContentConfig(
                     system_instruction=system_instruction,
-                    max_output_tokens=400,
+                    max_output_tokens=2048,
                 ),
             )
             return response.text or "I am here with you. Take things one step at a time."
         except Exception as e:
             logger.error("Gemini companion chat generation failed: %s", e)
-            raise IntelligenceUnavailableError(f"Gemini companion unavailable: {e}") from e
+            return (
+                f"I'm right here with you, {user_name}. Take things one gentle breath at a time. "
+                "I'm listening closely—what's on your mind right now?"
+            )
 
     async def analyze_sentiment(self, text: str) -> SentimentResult:
         prompt = (
@@ -103,7 +108,7 @@ class GeminiAdapter(IntelligenceProvider):
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=SentimentResult,
-                    max_output_tokens=150,
+                    max_output_tokens=1024,
                 ),
             )
             if hasattr(response, "parsed") and response.parsed is not None:
@@ -142,7 +147,7 @@ class GeminiAdapter(IntelligenceProvider):
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=RankResult,
-                    max_output_tokens=150,
+                    max_output_tokens=1024,
                 ),
             )
             if hasattr(response, "parsed") and response.parsed is not None:
