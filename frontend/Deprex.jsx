@@ -22,6 +22,7 @@ import {
   sendChatMessage,
   getWellbeingSummary,
 } from './api.js';
+import DashboardPrototypes from './DashboardPrototypes.jsx';
 
 function analyzeSentiment(text) {
   const pos=["happy","good","great","wonderful","excited","joy","grateful","calm","peaceful","love","hope","better","improving","smile","laugh","content","motivated","fine","okay","relief","nice","fun","enjoy","proud","relax"];
@@ -1488,7 +1489,7 @@ export default function Deprex(){
     <div style={{...bg,display:"flex",overflow:"hidden"}}>
       <Sidebar tab={tab} setTab={setTab} user={user} logout={handleLogout} risk={risk}/>
       <div style={{flex:1,overflow:"hidden"}}>
-        {tab==="dashboard"&&<Dashboard user={user} risk={risk} journals={journals} assessHistory={assessHistory} reliefEvents={reliefEvents} chatEvents={chatEvents} setTab={setTab}/>}
+        {tab==="dashboard"&&<DashboardPrototypes user={user} risk={risk} journals={journals} assessHistory={assessHistory} reliefEvents={reliefEvents} chatEvents={chatEvents} setTab={setTab}/>}
         {tab==="journal"&&<Journal user={user} journals={journals} onSave={saveJournal}/>}
         {tab==="assess"&&<Assessment onSave={saveAssessment} history={assessHistory}/>}
         {tab==="relief"&&<StressRelief user={user} onActivityComplete={handleActivityComplete} onEditInterests={()=>setTab("editInterests")}/>}
