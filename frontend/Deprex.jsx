@@ -22,7 +22,6 @@ import {
   sendChatMessage,
   getWellbeingSummary,
 } from './api.js';
-import DashboardPrototypes from './DashboardPrototypes.jsx';
 
 function analyzeSentiment(text) {
   const pos=["happy","good","great","wonderful","excited","joy","grateful","calm","peaceful","love","hope","better","improving","smile","laugh","content","motivated","fine","okay","relief","nice","fun","enjoy","proud","relax"];
@@ -539,134 +538,205 @@ function Sidebar({tab,setTab,user,logout,risk}){
   );
 }
 
-// ─── Dashboard ────────────────────────────────────────────────────────────────
+// ─── Dashboard (Reflective Journey) ──────────────────────────────────────────
 function Dashboard({user,risk,journals,assessHistory,reliefEvents,chatEvents,setTab}){
-  const ri=riskInfo(risk); const latest=assessHistory[assessHistory.length-1]; const sev=latest?severityLabel(latest.score):null;
-  const avgMood=journals.length?Math.round(journals.reduce((a,j)=>a+j.sentiment.score*100,0)/journals.length):null;
-  const activityImpact=computeActivityImpact(reliefEvents||[]);
+  const [selectedMood, setSelectedMood] = useState(null);
+  const latestAssess = assessHistory[assessHistory.length - 1];
+  const sev = latestAssess ? severityLabel(latestAssess.score) : null;
+  const recentJournal = journals[0];
 
-  // Compute per-day chat impact
-  const chatImpactByDay={};
-  (chatEvents||[]).forEach(ev=>{
-    const key=new Date(ev.date).toLocaleDateString("en-US",{month:"short",day:"numeric"});
-    if(!chatImpactByDay[key]) chatImpactByDay[key]={moodDelta:0,riskDelta:0,count:0,hasCrisis:false};
-    chatImpactByDay[key].moodDelta+=ev.moodDelta||0;
-    chatImpactByDay[key].riskDelta+=ev.riskDelta||0;
-    chatImpactByDay[key].count++;
-    if(ev.level==="crisis") chatImpactByDay[key].hasCrisis=true;
-  });
+  const MOOD_OPTIONS = [
+    { emoji: "✨", label: "Radiant", color: "#fbbf24", note: "Celebrate this warmth and carry it gently through your day." },
+    { emoji: "🌿", label: "Peaceful", color: "#4ade80", note: "A calm harbor is precious. Savor this centered stillness." },
+    { emoji: "☁️", label: "Foggy", color: "#94a3b8", note: "It's okay to feel unclear. Rest without pressure to solve anything." },
+    { emoji: "🌧️", label: "Heavy", color: "#60a5fa", note: "Your fatigue or sorrow is heard. Be extraordinarily gentle with yourself." },
+    { emoji: "🌪️", label: "Overwhelmed", color: "#f87171", note: "You are not alone in this storm. Try 60 seconds of box breathing below." },
+  ];
 
-  // Build chart: start with mock baseline, overlay real journal + activity + chat data
-  const baseChart=[...MOCK_TREND];
-  const allDates=new Set(baseChart.map(d=>d.date));
+  const activeMoodObj = MOOD_OPTIONS.find(m => m.label === selectedMood);
 
-  journals.slice(-5).forEach(j=>{
-    const dateKey=new Date(j.date).toLocaleDateString("en-US",{month:"short",day:"numeric"});
-    const baseMood=Math.round(j.sentiment.score*100);
-    const aImpact=activityImpact[dateKey]||{moodBoost:0,riskReduction:0};
-    const cImpact=chatImpactByDay[dateKey]||{moodDelta:0,riskDelta:0};
-    const finalMood=Math.min(100,Math.max(0, baseMood + aImpact.moodBoost + cImpact.moodDelta));
-    const finalRisk=Math.min(97,Math.max(2, Math.round(risk*100) - Math.round(aImpact.riskReduction*100) + Math.round(cImpact.riskDelta*100)));
-    if(!allDates.has(dateKey)){baseChart.push({date:dateKey,mood:finalMood,risk:finalRisk});}
-    else{const idx=baseChart.findIndex(d=>d.date===dateKey);if(idx>=0)baseChart[idx]={...baseChart[idx],mood:finalMood,risk:finalRisk};}
-    allDates.add(dateKey);
-  });
+  return (
+    <div style={{ padding: "34px 20px", overflowY: "auto", height: "100vh", paddingBottom: "70px" }}>
+      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        
+        {/* Warm Narrative Greeting */}
+        <div style={{ textAlign: "center", marginBottom: "30px" }}>
+          <span style={{ fontSize: "38px" }}>🌱</span>
+          <h1 style={{ color: "white", fontSize: "26px", fontWeight: "800", marginTop: "8px", letterSpacing: "-0.01em" }}>
+            How is your heart feeling today, {user.name}?
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "13px", marginTop: "5px" }}>
+            Take a breath. No performance, no judgments. Just honest presence.
+          </p>
 
-  // Overlay activity-only days
-  Object.entries(activityImpact).forEach(([dateKey,impact])=>{
-    if(!allDates.has(dateKey)){
-      const cImpact=chatImpactByDay[dateKey]||{moodDelta:0,riskDelta:0};
-      baseChart.push({date:dateKey,mood:Math.min(100,55+impact.moodBoost+cImpact.moodDelta),risk:Math.max(2,Math.round(risk*100)-Math.round(impact.riskReduction*100)+Math.round(cImpact.riskDelta*100))});
-      allDates.add(dateKey);
-    }
-  });
+          {/* Interactive Mood Selector */}
+          <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "18px", flexWrap: "wrap" }}>
+            {MOOD_OPTIONS.map(m => (
+              <button
+                key={m.label}
+                onClick={() => setSelectedMood(m.label)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  padding: "9px 16px",
+                  background: selectedMood === m.label ? `${m.color}25` : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${selectedMood === m.label ? m.color : "rgba(255,255,255,0.08)"}`,
+                  borderRadius: "999px",
+                  color: selectedMood === m.label ? m.color : "rgba(255,255,255,0.6)",
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  boxShadow: selectedMood === m.label ? `0 0 15px ${m.color}40` : "none"
+                }}
+              >
+                <span>{m.emoji}</span> {m.label}
+              </button>
+            ))}
+          </div>
+          {activeMoodObj && (
+            <div style={{
+              marginTop: "14px",
+              padding: "10px 18px",
+              background: `${activeMoodObj.color}15`,
+              border: `1px solid ${activeMoodObj.color}35`,
+              borderRadius: "12px",
+              display: "inline-block",
+              color: "#f1f5f9",
+              fontSize: "12px"
+            }}>
+              Acknowledged: You are feeling <strong style={{ color: activeMoodObj.color }}>{activeMoodObj.label}</strong>. {activeMoodObj.note}
+            </div>
+          )}
+        </div>
 
-  // Overlay chat-only days
-  Object.entries(chatImpactByDay).forEach(([dateKey,impact])=>{
-    if(!allDates.has(dateKey)){
-      baseChart.push({date:dateKey,mood:Math.min(100,Math.max(0,55+impact.moodDelta)),risk:Math.min(97,Math.max(2,Math.round(risk*100)+Math.round(impact.riskDelta*100)))});
-      allDates.add(dateKey);
-    }
-  });
-
-  const chartData=baseChart.slice(-10);
-  const totalActivities=(reliefEvents||[]).length;
-  const crisisCount=(chatEvents||[]).filter(e=>e.level==="crisis").length;
-  const matchedInterests=user.interests?.filter(i=>INTEREST_RESOURCES[i])||[];
-  return(
-    <div style={{padding:"26px 30px",overflowY:"auto",height:"100vh"}}>
-      <div style={{marginBottom:"18px"}}><h1 style={{color:"white",fontSize:"22px",fontWeight:"800"}}>Welcome back, {user.name} 👋</h1><p style={{color:"rgba(255,255,255,0.3)",marginTop:"3px",fontSize:"12px"}}>{new Date().toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</p></div>
-      <div style={{background:"rgba(99,102,241,0.07)",border:"1px solid rgba(99,102,241,0.18)",borderRadius:"10px",padding:"9px 13px",marginBottom:"18px",fontSize:"11px",color:"rgba(255,255,255,0.42)",lineHeight:"1.5"}}>
-        ⚕️ <strong style={{color:"rgba(255,255,255,0.7)"}}>Disclaimer:</strong> Deprex provides early risk <em>indicators</em> and support guidance only. It does <strong style={{color:"rgba(255,255,255,0.7)"}}>not diagnose</strong> any condition. Consult a qualified professional for diagnosis and treatment.
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"12px",marginBottom:"18px"}}>
-        {[{label:"Risk Score",val:`${(risk*100).toFixed(0)}%`,sub:ri.label,icon:"⚡",c:ri.color},{label:"Journals",val:journals.length,sub:"Entries logged",icon:"📝",c:"#7c3aed"},{label:"Assessment",val:latest?`${latest.score}/${ASSESSMENT_QUESTIONS.length*3}`:"—",sub:sev?.label??"Not taken",icon:"🌡️",c:sev?.color??"#555"},{label:"Activities Done",val:totalActivities,sub:"Relief activities",icon:"🌿",c:"#16a34a"}].map(s=>(
-          <div key={s.label} style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"13px",padding:"14px"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-              <div><div style={{color:"rgba(255,255,255,0.36)",fontSize:"10px",marginBottom:"5px",textTransform:"uppercase",letterSpacing:"0.4px"}}>{s.label}</div><div style={{color:s.c,fontSize:"22px",fontWeight:"800"}}>{s.val}</div><div style={{color:"rgba(255,255,255,0.3)",fontSize:"10px",marginTop:"2px"}}>{s.sub}</div></div>
-              <span style={{fontSize:"18px",opacity:0.8}}>{s.icon}</span>
+        {/* Narrative Milestone Stream */}
+        <div style={{ position: "relative", paddingLeft: "30px", borderLeft: "2px dashed rgba(139, 92, 246, 0.25)", marginLeft: "14px" }}>
+          
+          {/* Milestone 1: Daily Somatic Anchor */}
+          <div style={{ position: "relative", marginBottom: "26px" }}>
+            <div style={{ position: "absolute", left: "-39px", top: "0", width: "16px", height: "16px", borderRadius: "50%", background: "#8b5cf6", boxShadow: "0 0 10px #8b5cf6" }} />
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(139,92,246,0.22)", borderRadius: "14px", padding: "18px", backdropFilter: "blur(12px)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                <span style={{ color: "#c4b5fd", fontSize: "11px", fontWeight: "800", textTransform: "uppercase" }}>Somatic Anchor</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "11px" }}>Daily practice</span>
+              </div>
+              <h3 style={{ color: "white", fontSize: "15px", fontWeight: "700", margin: 0 }}>4-4-4-4 Box Breathing Reset</h3>
+              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "4px", lineHeight: "1.4" }}>
+                Soothe your autonomic nervous system and release muscle tightness with our guided 4-phase breathing sanctuary.
+              </p>
+              <button
+                onClick={() => setTab("relief")}
+                style={{ marginTop: "10px", padding: "8px 16px", background: "linear-gradient(135deg, rgba(139,92,246,0.3), rgba(59,130,246,0.2))", border: "1px solid rgba(139,92,246,0.45)", borderRadius: "9px", color: "#c4b5fd", fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
+              >
+                🌿 Launch Breathing Sanctuary ↗
+              </button>
             </div>
           </div>
-        ))}
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"14px",marginBottom:"16px"}}>
-        <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"13px",padding:"18px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-            <h3 style={{color:"white",fontWeight:"700",fontSize:"13px"}}>📈 Mood Progression</h3>
-            {totalActivities>0&&<span style={{background:"rgba(34,197,94,0.15)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:"20px",padding:"2px 8px",color:"#4ade80",fontSize:"10px",fontWeight:"600"}}>{totalActivities} activities completed</span>}
-          </div>
-          <ResponsiveContainer width="100%" height={170}>
-            <AreaChart data={chartData}><defs><linearGradient id="mG" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#7c3aed" stopOpacity={0.25}/><stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/></linearGradient></defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)"/><XAxis dataKey="date" tick={{fill:"rgba(255,255,255,0.3)",fontSize:10}}/><YAxis tick={{fill:"rgba(255,255,255,0.3)",fontSize:10}} domain={[0,100]}/>
-              <Tooltip contentStyle={{background:"#1a1030",border:"1px solid rgba(124,58,237,0.4)",borderRadius:"8px",color:"white",fontSize:"11px"}}/>
-              <Area type="monotone" dataKey="mood" stroke="#7c3aed" fill="url(#mG)" strokeWidth={2} dot={{fill:"#7c3aed",r:2}} name="Mood %"/>
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-        <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"13px",padding:"18px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-            <h3 style={{color:"white",fontWeight:"700",fontSize:"13px"}}>⚡ Risk Score Trend</h3>
-            {totalActivities>0&&<span style={{background:"rgba(124,58,237,0.15)",border:"1px solid rgba(124,58,237,0.3)",borderRadius:"20px",padding:"2px 8px",color:"#c4b5fd",fontSize:"10px",fontWeight:"600"}}>Updating with your activity</span>}
-          </div>
-          <ResponsiveContainer width="100%" height={170}>
-            <LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)"/><XAxis dataKey="date" tick={{fill:"rgba(255,255,255,0.3)",fontSize:10}}/><YAxis tick={{fill:"rgba(255,255,255,0.3)",fontSize:10}} domain={[0,100]}/>
-              <Tooltip contentStyle={{background:"#1a1030",border:"1px solid rgba(239,68,68,0.4)",borderRadius:"8px",color:"white",fontSize:"11px"}} formatter={v=>[v+"%","Risk"]}/>
-              <Line type="monotone" dataKey="risk" stroke="#ef4444" strokeWidth={2} dot={{fill:"#ef4444",r:2}} name="Risk %"/>
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-      {matchedInterests.length>0&&(
-        <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"13px",padding:"18px",marginBottom:"14px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-            <h3 style={{color:"white",fontWeight:"700",fontSize:"13px"}}>🌿 Your Stress Relief Resources</h3>
-            <button onClick={()=>setTab("relief")} style={{background:"rgba(124,58,237,0.16)",border:"1px solid rgba(124,58,237,0.28)",borderRadius:"20px",padding:"4px 10px",color:"#c4b5fd",fontSize:"11px",cursor:"pointer"}}>See all →</button>
-          </div>
-          <div style={{display:"flex",gap:"9px",overflowX:"auto",paddingBottom:"4px"}}>
-            {matchedInterests.slice(0,5).map(interest=>{
-              const d=INTEREST_RESOURCES[interest]; const res=d.resources[0];
-              return(
-                <div key={interest} style={{background:`${d.color}12`,border:`1px solid ${d.color}22`,borderRadius:"10px",padding:"12px",minWidth:"180px",flexShrink:0}}>
-                  <div style={{fontSize:"18px",marginBottom:"5px"}}>{d.icon}</div>
-                  <div style={{color:"white",fontWeight:"700",fontSize:"12px",marginBottom:"3px"}}>{interest}</div>
-                  <div style={{color:"rgba(255,255,255,0.4)",fontSize:"11px",marginBottom:"9px"}}>{d.resources.length} resources available</div>
-                  <button onClick={()=>setTab("relief")} style={{padding:"5px 10px",background:`${d.color}28`,border:`1px solid ${d.color}44`,borderRadius:"7px",color:d.color,fontSize:"11px",fontWeight:"700",cursor:"pointer",width:"100%"}}>Access Resources →</button>
+
+          {/* Milestone 2: Journal Chronicle */}
+          <div style={{ position: "relative", marginBottom: "26px" }}>
+            <div style={{ position: "absolute", left: "-39px", top: "0", width: "16px", height: "16px", borderRadius: "50%", background: "#3b82f6", boxShadow: "0 0 10px #3b82f6" }} />
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(59,130,246,0.22)", borderRadius: "14px", padding: "18px", backdropFilter: "blur(12px)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                <span style={{ color: "#93c5fd", fontSize: "11px", fontWeight: "800", textTransform: "uppercase" }}>Reflective Space</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "11px" }}>Writing</span>
+              </div>
+              <h3 style={{ color: "white", fontSize: "15px", fontWeight: "700", margin: 0 }}>Your Daily Journal</h3>
+              {recentJournal ? (
+                <div style={{ marginTop: "8px", padding: "10px 14px", background: "rgba(255,255,255,0.03)", borderRadius: "10px", borderLeft: "3px solid #3b82f6" }}>
+                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "10px", marginBottom: "3px" }}>Latest Entry:</div>
+                  <div style={{ color: "rgba(255,255,255,0.75)", fontSize: "12px", fontStyle: "italic", lineHeight: "1.4" }}>
+                    "{(recentJournal.text || recentJournal.content || "").slice(0, 120)}…"
+                  </div>
                 </div>
-              );
-            })}
+              ) : (
+                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "4px", lineHeight: "1.4" }}>
+                  Writing untangles difficult knots in the mind. Record a short moment from your day.
+                </p>
+              )}
+              <button
+                onClick={() => setTab("journal")}
+                style={{ marginTop: "10px", padding: "8px 16px", background: "rgba(59,130,246,0.2)", border: "1px solid rgba(59,130,246,0.4)", borderRadius: "9px", color: "#93c5fd", fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
+              >
+                📝 {recentJournal ? "Continue Journaling ↗" : "Write First Reflection ↗"}
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-      {(risk>0.5||crisisCount>0)&&(
-        <div style={{background:"rgba(124,58,237,0.07)",border:"1px solid rgba(124,58,237,0.22)",borderRadius:"13px",padding:"16px"}}>
-          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"8px"}}><span>💙</span><strong style={{color:"#c4b5fd",fontSize:"13px"}}>We're here for you</strong></div>
-          <p style={{color:"rgba(255,255,255,0.5)",fontSize:"12px",marginBottom:"10px"}}>It looks like you may be going through a tough time. You don't have to face this alone — real support is just a call away.</p>
-          <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
-            <a href="tel:988" style={{padding:"6px 12px",background:"rgba(124,58,237,0.2)",border:"1px solid rgba(124,58,237,0.4)",borderRadius:"7px",color:"#c4b5fd",textDecoration:"none",fontSize:"12px",fontWeight:"600"}}>📞 Talk to someone — 988</a>
-            <a href="https://988lifeline.org/chat" target="_blank" rel="noopener noreferrer" style={{padding:"6px 12px",background:"rgba(124,58,237,0.1)",border:"1px solid rgba(124,58,237,0.25)",borderRadius:"7px",color:"#c4b5fd",textDecoration:"none",fontSize:"12px"}}>💬 Chat online</a>
+
+          {/* Milestone 3: Clinical Baseline */}
+          <div style={{ position: "relative", marginBottom: "26px" }}>
+            <div style={{ position: "absolute", left: "-39px", top: "0", width: "16px", height: "16px", borderRadius: "50%", background: "#10b981", boxShadow: "0 0 10px #10b981" }} />
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(16,185,129,0.22)", borderRadius: "14px", padding: "18px", backdropFilter: "blur(12px)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                <span style={{ color: "#6ee7b7", fontSize: "11px", fontWeight: "800", textTransform: "uppercase" }}>Clinical Baseline</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "11px" }}>PHQ-9 psychometric</span>
+              </div>
+              <h3 style={{ color: "white", fontSize: "15px", fontWeight: "700", margin: 0 }}>Mood & Risk Posture</h3>
+              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "4px", lineHeight: "1.4" }}>
+                {latestAssess ? `Last screening score: ${latestAssess.score}/27 • ${sev?.label || "Monitored"}` : "Track clinical trends over time to guide conversations with your care circle."}
+              </p>
+              <button
+                onClick={() => setTab("assess")}
+                style={{ marginTop: "10px", padding: "8px 16px", background: "rgba(16,185,129,0.2)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: "9px", color: "#6ee7b7", fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
+              >
+                🌡️ {latestAssess ? "Retake PHQ-9 Assessment ↗" : "Start PHQ-9 Screening ↗"}
+              </button>
+            </div>
           </div>
+
+          {/* Milestone 4: AI Support Companion */}
+          <div style={{ position: "relative", marginBottom: "26px" }}>
+            <div style={{ position: "absolute", left: "-39px", top: "0", width: "16px", height: "16px", borderRadius: "50%", background: "#a855f7", boxShadow: "0 0 10px #a855f7" }} />
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(168,85,247,0.22)", borderRadius: "14px", padding: "18px", backdropFilter: "blur(12px)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                <span style={{ color: "#d8b4fe", fontSize: "11px", fontWeight: "800", textTransform: "uppercase" }}>Support Companion</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "11px" }}>24/7 AI conversation</span>
+              </div>
+              <h3 style={{ color: "white", fontSize: "15px", fontWeight: "700", margin: 0 }}>Conversational Sanctuary</h3>
+              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "4px", lineHeight: "1.4" }}>
+                Vent freely, unpack heavy emotions, or practice cognitive reframing anytime.
+              </p>
+              <button
+                onClick={() => setTab("chat")}
+                style={{ marginTop: "10px", padding: "8px 16px", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: "9px", color: "#d8b4fe", fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
+              >
+                💬 Chat with Companion ↗
+              </button>
+            </div>
+          </div>
+
+          {/* Milestone 5: 24/7 Crisis Guardrail */}
+          <div style={{ position: "relative" }}>
+            <div style={{ position: "absolute", left: "-39px", top: "0", width: "16px", height: "16px", borderRadius: "50%", background: "#ef4444", boxShadow: "0 0 10px #ef4444" }} />
+            <div style={{ background: "linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(139,92,246,0.04) 100%)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "14px", padding: "18px", backdropFilter: "blur(12px)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+              <div>
+                <div style={{ color: "#f87171", fontSize: "11px", fontWeight: "800", textTransform: "uppercase" }}>Immediate Lifeline</div>
+                <h4 style={{ color: "white", fontSize: "14px", fontWeight: "700", margin: "2px 0" }}>988 Suicide & Crisis Lifeline</h4>
+                <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "11px", margin: 0 }}>Free, confidential, available 24/7 by call or text.</p>
+              </div>
+              <a
+                href="tel:988"
+                style={{
+                  padding: "9px 18px",
+                  background: "rgba(239,68,68,0.2)",
+                  border: "1px solid rgba(239,68,68,0.4)",
+                  borderRadius: "10px",
+                  color: "#fca5a5",
+                  textDecoration: "none",
+                  fontSize: "12px",
+                  fontWeight: "800",
+                  flexShrink: 0
+                }}
+              >
+                📞 Call 988
+              </a>
+            </div>
+          </div>
+
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -1489,7 +1559,7 @@ export default function Deprex(){
     <div style={{...bg,display:"flex",overflow:"hidden"}}>
       <Sidebar tab={tab} setTab={setTab} user={user} logout={handleLogout} risk={risk}/>
       <div style={{flex:1,overflow:"hidden"}}>
-        {tab==="dashboard"&&<DashboardPrototypes user={user} risk={risk} journals={journals} assessHistory={assessHistory} reliefEvents={reliefEvents} chatEvents={chatEvents} setTab={setTab}/>}
+        {tab==="dashboard"&&<Dashboard user={user} risk={risk} journals={journals} assessHistory={assessHistory} reliefEvents={reliefEvents} chatEvents={chatEvents} setTab={setTab}/>}
         {tab==="journal"&&<Journal user={user} journals={journals} onSave={saveJournal}/>}
         {tab==="assess"&&<Assessment onSave={saveAssessment} history={assessHistory}/>}
         {tab==="relief"&&<StressRelief user={user} onActivityComplete={handleActivityComplete} onEditInterests={()=>setTab("editInterests")}/>}
