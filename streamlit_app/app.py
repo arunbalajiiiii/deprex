@@ -16,6 +16,12 @@ from streamlit_app.catalog import (
     GROUNDING_TECHNIQUES,
     INTEREST_CATALOG,
 )
+from streamlit_app.prototype import (
+    render_prototype_switcher,
+    render_variant_a,
+    render_variant_b,
+    render_variant_c,
+)
 
 st.set_page_config(
     page_title="Deprex — Mental Health Risk Monitoring & Companion",
@@ -125,6 +131,7 @@ with st.sidebar:
     page = st.radio(
         "Navigation",
         [
+            "🎨 UI Prototype (3 Designs)",
             "💬 Companion Chat",
             "📊 PHQ-9 Assessment",
             "📖 Reflective Journal",
@@ -140,8 +147,18 @@ with st.sidebar:
         st.rerun()
 
 
+# ─── Prototype Switcher & Variations ───────────────────────────────────────────
+if page == "🎨 UI Prototype (3 Designs)":
+    chosen_variant = render_prototype_switcher()
+    if chosen_variant == "A":
+        render_variant_a(user)
+    elif chosen_variant == "B":
+        render_variant_b(user)
+    elif chosen_variant == "C":
+        render_variant_c(user)
+
 # ─── View 1: Companion Chat ────────────────────────────────────────────────────
-if page == "💬 Companion Chat":
+elif page == "💬 Companion Chat":
     st.markdown(
         """
         <div class="dx-header" style="text-align: left; padding: 10px 0 15px 0;">
