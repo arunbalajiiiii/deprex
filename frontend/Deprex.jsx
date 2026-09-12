@@ -181,30 +181,30 @@ function Auth({onAuth}){
     setBusy(false);
   };
   const inp=(field,type="text")=>({type,value:f[field],onChange:e=>setF({...f,[field]:e.target.value}),onKeyDown:e=>e.key==="Enter"&&submit(),
-    style:{width:"100%",padding:"11px 15px",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(139,92,246,0.22)",borderRadius:"9px",color:"white",fontSize:"14px",outline:"none",boxSizing:"border-box"}});
+    style:{width:"100%",padding:"12px 16px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(139,92,246,0.2)",borderRadius:"10px",color:"white",fontSize:"14px",outline:"none",boxSizing:"border-box",transition:"all 0.2s ease"}});
   return(
-    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(ellipse at 30% 20%, #1a0a2e 0%, #0a0a14 50%, #091220 100%)"}}>
-      <div style={{background:"rgba(255,255,255,0.025)",backdropFilter:"blur(24px)",border:"1px solid rgba(139,92,246,0.15)",borderRadius:"22px",padding:"44px",width:"100%",maxWidth:"400px"}}>
-        <div style={{textAlign:"center",marginBottom:"28px"}}>
-          <div style={{fontSize:"44px",marginBottom:"10px"}}>🧠</div>
-          <h1 style={{color:"white",fontSize:"26px",fontWeight:"900"}}>Deprex</h1>
-          <p style={{color:"rgba(255,255,255,0.38)",fontSize:"13px",marginTop:"3px"}}>Mental Health Risk Monitoring & Support</p>
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(ellipse at 25% 15%, rgba(139, 92, 246, 0.12) 0%, #080811 50%, #0a1120 100%)",padding:"20px"}}>
+      <div style={{background:"rgba(18, 14, 34, 0.8)",backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",border:"1px solid rgba(139,92,246,0.25)",borderRadius:"24px",padding:"44px 38px",width:"100%",maxWidth:"420px",boxShadow:"0 20px 60px rgba(0,0,0,0.6), 0 0 35px rgba(139,92,246,0.15)"}}>
+        <div style={{textAlign:"center",marginBottom:"26px"}}>
+          <div style={{fontSize:"48px",marginBottom:"12px",display:"inline-block",animation:"floatSlow 3s ease-in-out infinite"}}>🧠</div>
+          <h1 style={{fontSize:"28px",fontWeight:"800",letterSpacing:"-0.02em",background:"linear-gradient(135deg, #c084fc 0%, #60a5fa 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",margin:"0 0 4px 0"}}>Deprex</h1>
+          <p style={{color:"rgba(255,255,255,0.48)",fontSize:"13px",margin:0}}>Mental Health Risk Monitoring & AI Companion</p>
         </div>
-        <div style={{display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:"10px",padding:"3px",marginBottom:"22px"}}>
+        <div style={{display:"flex",background:"rgba(255,255,255,0.04)",borderRadius:"12px",padding:"4px",marginBottom:"24px",border:"1px solid rgba(255,255,255,0.06)"}}>
           {[["login","Sign In"],["register","Register"]].map(([m,l])=>(
-            <button key={m} onClick={()=>{setMode(m);setErr("");}} style={{flex:1,padding:"8px",borderRadius:"8px",border:"none",cursor:"pointer",fontSize:"13px",fontWeight:"600",background:mode===m?"linear-gradient(135deg,#7c3aed,#2563eb)":"transparent",color:mode===m?"white":"rgba(255,255,255,0.42)"}}>{l}</button>
+            <button key={m} onClick={()=>{setMode(m);setErr("");}} style={{flex:1,padding:"9px",borderRadius:"9px",border:"none",cursor:"pointer",fontSize:"13px",fontWeight:"700",background:mode===m?"linear-gradient(135deg,#7c3aed,#2563eb)":"transparent",color:mode===m?"white":"rgba(255,255,255,0.45)",transition:"all 0.2s ease"}}>{l}</button>
           ))}
         </div>
-        <div style={{display:"flex",flexDirection:"column",gap:"14px"}}>
-          {mode==="register"&&<div><label style={{color:"rgba(255,255,255,0.55)",fontSize:"12px",display:"block",marginBottom:"5px"}}>Full Name</label><input {...inp("name")} placeholder="Your name"/></div>}
-          <div><label style={{color:"rgba(255,255,255,0.55)",fontSize:"12px",display:"block",marginBottom:"5px"}}>Email</label><input {...inp("email","email")} placeholder="you@example.com"/></div>
-          <div><label style={{color:"rgba(255,255,255,0.55)",fontSize:"12px",display:"block",marginBottom:"5px"}}>Password</label><input {...inp("password","password")} placeholder="••••••••"/></div>
+        <div style={{display:"flex",flexDirection:"column",gap:"15px"}}>
+          {mode==="register"&&<div><label style={{color:"rgba(255,255,255,0.6)",fontSize:"12px",fontWeight:"600",display:"block",marginBottom:"6px"}}>Full Name</label><input {...inp("name")} placeholder="Your preferred name"/></div>}
+          <div><label style={{color:"rgba(255,255,255,0.6)",fontSize:"12px",fontWeight:"600",display:"block",marginBottom:"6px"}}>Email</label><input {...inp("email","email")} placeholder="you@example.com"/></div>
+          <div><label style={{color:"rgba(255,255,255,0.6)",fontSize:"12px",fontWeight:"600",display:"block",marginBottom:"6px"}}>Password</label><input {...inp("password","password")} placeholder="••••••••"/></div>
         </div>
-        {err&&<div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.3)",borderRadius:"8px",padding:"9px 13px",color:"#f87171",fontSize:"13px",marginTop:"14px"}}>{err}</div>}
-        <button onClick={submit} disabled={busy} style={{width:"100%",padding:"13px",background:"linear-gradient(135deg,#7c3aed,#2563eb)",border:"none",borderRadius:"11px",color:"white",fontSize:"15px",fontWeight:"700",cursor:"pointer",marginTop:"20px",opacity:busy?0.7:1}}>
-          {busy?"Please wait...":mode==="login"?"Sign In":"Create Account"}
+        {err&&<div style={{background:"rgba(239,68,68,0.12)",border:"1px solid rgba(239,68,68,0.35)",borderRadius:"10px",padding:"10px 14px",color:"#fca5a5",fontSize:"13px",marginTop:"16px",lineHeight:"1.4"}}>{err}</div>}
+        <button onClick={submit} disabled={busy} style={{width:"100%",padding:"13px",background:"linear-gradient(135deg,#7c3aed,#2563eb)",border:"none",borderRadius:"12px",color:"white",fontSize:"14px",fontWeight:"700",cursor:"pointer",marginTop:"22px",opacity:busy?0.7:1,boxShadow:"0 8px 24px rgba(124, 58, 237, 0.4)",transition:"all 0.2s ease"}}>
+          {busy?"Authenticating...":mode==="login"?"Sign In to Deprex":"Create Free Account"}
         </button>
-        <p style={{textAlign:"center",color:"rgba(255,255,255,0.25)",fontSize:"11px",marginTop:"18px",lineHeight:"1.5"}}>⚕️ Deprex does not diagnose depression. It provides early risk indicators and support guidance only.</p>
+        <p style={{textAlign:"center",color:"rgba(255,255,255,0.3)",fontSize:"11px",marginTop:"20px",lineHeight:"1.5"}}>⚕️ Deprex does not diagnose depression. Free 24/7 crisis support is always available at 988.</p>
       </div>
     </div>
   );
@@ -463,56 +463,76 @@ function computeActivityImpact(reliefEvents) {
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 function Sidebar({tab,setTab,user,logout,risk}){
   const ri=riskInfo(risk);
-  const navs=[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"journal",icon:"📝",label:"Daily Journal"},{id:"assess",icon:"🌡️",label:"Mood Assessment"},{id:"relief",icon:"🌿",label:"Stress Relief"},{id:"chat",icon:"💬",label:"AI Support Chat"}];
+  const navs=[
+    {id:"dashboard",icon:"📊",label:"Dashboard"},
+    {id:"journal",icon:"📝",label:"Daily Journal"},
+    {id:"assess",icon:"🌡️",label:"Mood Assessment"},
+    {id:"relief",icon:"🌿",label:"Stress Relief"},
+    {id:"chat",icon:"💬",label:"AI Support Chat"}
+  ];
   return(
-    <div style={{width:"248px",minHeight:"100vh",background:"rgba(0,0,0,0.28)",borderRight:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",padding:"20px 13px",flexShrink:0}}>
-      <div style={{display:"flex",alignItems:"center",gap:"10px",marginBottom:"24px",padding:"0 7px"}}>
-        <div style={{width:"36px",height:"36px",background:"linear-gradient(135deg,#7c3aed,#2563eb)",borderRadius:"9px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"17px",flexShrink:0}}>🧠</div>
-        <div><div style={{color:"white",fontWeight:"800",fontSize:"17px"}}>Deprex</div><div style={{color:"rgba(255,255,255,0.3)",fontSize:"10px"}}>Mental Health Monitor</div></div>
+    <div style={{width:"256px",minHeight:"100vh",background:"rgba(12, 10, 24, 0.75)",backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",borderRight:"1px solid rgba(139,92,246,0.15)",display:"flex",flexDirection:"column",padding:"22px 14px",flexShrink:0}}>
+      <div style={{display:"flex",alignItems:"center",gap:"11px",marginBottom:"26px",padding:"0 6px"}}>
+        <div style={{width:"38px",height:"38px",background:"linear-gradient(135deg,#7c3aed,#2563eb)",borderRadius:"10px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"19px",flexShrink:0,boxShadow:"0 4px 14px rgba(124,58,237,0.35)"}}>🧠</div>
+        <div>
+          <div style={{color:"white",fontWeight:"800",fontSize:"17px",letterSpacing:"-0.01em"}}>Deprex</div>
+          <div style={{color:"#4ade80",fontSize:"11px",display:"flex",alignItems:"center",gap:"4px",fontWeight:"600"}}>
+            <span style={{width:"6px",height:"6px",borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 8px #4ade80"}}></span> Online
+          </div>
+        </div>
       </div>
-      <div style={{background:ri.bg,border:`1px solid ${ri.border}`,borderRadius:"11px",padding:"11px",marginBottom:"18px"}}>
-        <div style={{color:"rgba(255,255,255,0.38)",fontSize:"10px",marginBottom:"5px",textTransform:"uppercase",letterSpacing:"0.5px"}}>Risk Level</div>
+      <div style={{background:ri.bg,border:`1px solid ${ri.border}`,borderRadius:"12px",padding:"12px",marginBottom:"18px",boxShadow:"0 4px 14px rgba(0,0,0,0.2)"}}>
+        <div style={{color:"rgba(255,255,255,0.45)",fontSize:"10px",marginBottom:"4px",textTransform:"uppercase",letterSpacing:"0.5px",fontWeight:"700"}}>Risk Posture</div>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <span style={{color:ri.color,fontWeight:"700",fontSize:"13px"}}>{ri.label}</span>
-          <span style={{color:ri.color,fontSize:"12px",fontWeight:"600"}}>{(risk*100).toFixed(0)}%</span>
+          <span style={{color:ri.color,fontSize:"12px",fontWeight:"700"}}>{(risk*100).toFixed(0)}%</span>
         </div>
-        <div style={{background:"rgba(255,255,255,0.1)",borderRadius:"3px",height:"3px",marginTop:"6px"}}>
-          <div style={{width:`${risk*100}%`,height:"100%",borderRadius:"3px",background:ri.color,transition:"width 0.6s"}}/>
+        <div style={{background:"rgba(255,255,255,0.1)",borderRadius:"4px",height:"4px",marginTop:"6px",overflow:"hidden"}}>
+          <div style={{width:`${risk*100}%`,height:"100%",borderRadius:"4px",background:ri.color,transition:"width 0.6s ease"}}/>
         </div>
       </div>
       {user.interests?.length>0&&(
-        <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:"9px",padding:"9px 10px",marginBottom:"4px"}}>
+        <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(139,92,246,0.12)",borderRadius:"10px",padding:"10px 11px",marginBottom:"6px"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}>
-            <div style={{color:"rgba(255,255,255,0.32)",fontSize:"10px",textTransform:"uppercase",letterSpacing:"0.4px"}}>My Interests</div>
-            <button onClick={()=>setTab("editInterests")} style={{background:"rgba(124,58,237,0.2)",border:"1px solid rgba(124,58,237,0.35)",borderRadius:"6px",padding:"2px 7px",color:"#c4b5fd",fontSize:"10px",cursor:"pointer",fontWeight:"600"}}>✏️ Edit</button>
+            <div style={{color:"rgba(255,255,255,0.4)",fontSize:"10px",textTransform:"uppercase",letterSpacing:"0.4px",fontWeight:"700"}}>My Interests</div>
+            <button onClick={()=>setTab("editInterests")} style={{background:"rgba(124,58,237,0.2)",border:"1px solid rgba(124,58,237,0.35)",borderRadius:"6px",padding:"2px 8px",color:"#c4b5fd",fontSize:"10px",cursor:"pointer",fontWeight:"600"}}>✏️ Edit</button>
           </div>
           <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
             {user.interests.slice(0,6).map(i=>{
               const d=INTEREST_RESOURCES[i];
-              return <span key={i} style={{background:d?`${d.color}18`:"rgba(124,58,237,0.16)",borderRadius:"20px",padding:"2px 7px",color:d?d.color:"#c4b5fd",fontSize:"10px",display:"flex",alignItems:"center",gap:"3px"}}>{d?.icon} {i}</span>;
+              return <span key={i} style={{background:d?`${d.color}18`:"rgba(124,58,237,0.16)",border:`1px solid ${d?d.color+"30":"rgba(124,58,237,0.3)"}`,borderRadius:"20px",padding:"2px 8px",color:d?d.color:"#c4b5fd",fontSize:"10px",display:"flex",alignItems:"center",gap:"3px",fontWeight:"600"}}>{d?.icon} {i}</span>;
             })}
-            {user.interests.length>6&&<button onClick={()=>setTab("editInterests")} style={{background:"none",border:"none",color:"rgba(255,255,255,0.28)",fontSize:"10px",cursor:"pointer",padding:"2px 5px"}}>+{user.interests.length-6} more…</button>}
+            {user.interests.length>6&&<button onClick={()=>setTab("editInterests")} style={{background:"none",border:"none",color:"rgba(255,255,255,0.35)",fontSize:"10px",cursor:"pointer",padding:"2px 5px"}}>+{user.interests.length-6} more…</button>}
           </div>
         </div>
       )}
       {(!user.interests||user.interests.length===0)&&(
-        <button onClick={()=>setTab("editInterests")} style={{display:"flex",alignItems:"center",gap:"7px",width:"100%",padding:"9px 12px",background:"rgba(124,58,237,0.1)",border:"1px dashed rgba(124,58,237,0.35)",borderRadius:"9px",color:"#c4b5fd",fontSize:"12px",cursor:"pointer",marginBottom:"4px"}}>
+        <button onClick={()=>setTab("editInterests")} style={{display:"flex",alignItems:"center",gap:"7px",width:"100%",padding:"10px 12px",background:"rgba(124,58,237,0.1)",border:"1px dashed rgba(124,58,237,0.4)",borderRadius:"10px",color:"#c4b5fd",fontSize:"12px",cursor:"pointer",marginBottom:"6px",fontWeight:"600"}}>
           ✨ Set your interests
         </button>
       )}
       <nav style={{flex:1,marginTop:"12px"}}>
         {navs.map(n=>(
-          <button key={n.id} onClick={()=>setTab(n.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:"9px",padding:"10px 12px",borderRadius:"9px",border:tab===n.id?"1px solid rgba(124,58,237,0.32)":"1px solid transparent",cursor:"pointer",marginBottom:"3px",background:tab===n.id?"rgba(124,58,237,0.15)":"transparent",color:tab===n.id?"white":"rgba(255,255,255,0.4)",fontWeight:tab===n.id?"600":"400",fontSize:"13px",textAlign:"left",transition:"all 0.15s"}}>
-            <span style={{fontSize:"15px"}}>{n.icon}</span>{n.label}
+          <button key={n.id} onClick={()=>setTab(n.id)} style={{
+            width:"100%",display:"flex",alignItems:"center",gap:"10px",padding:"11px 13px",borderRadius:"10px",
+            border:tab===n.id?"1px solid rgba(124,58,237,0.45)":"1px solid transparent",
+            cursor:"pointer",marginBottom:"4px",
+            background:tab===n.id?"linear-gradient(90deg, rgba(124,58,237,0.24) 0%, rgba(37,99,235,0.12) 100%)":"transparent",
+            color:tab===n.id?"white":"rgba(255,255,255,0.45)",
+            fontWeight:tab===n.id?"700":"400",
+            fontSize:"13px",textAlign:"left",transition:"all 0.15s ease",
+            boxShadow:tab===n.id?"0 4px 14px rgba(124,58,237,0.2)":"none"
+          }}>
+            <span style={{fontSize:"16px"}}>{n.icon}</span>{n.label}
           </button>
         ))}
       </nav>
-      <div style={{borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:"12px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:"8px",padding:"5px 10px",marginBottom:"7px"}}>
-          <div style={{width:"28px",height:"28px",background:"linear-gradient(135deg,#7c3aed,#2563eb)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontWeight:"700",fontSize:"12px",flexShrink:0}}>{user.name[0].toUpperCase()}</div>
-          <div style={{overflow:"hidden"}}><div style={{color:"white",fontSize:"12px",fontWeight:"600",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{user.name}</div><div style={{color:"rgba(255,255,255,0.3)",fontSize:"10px"}}>{user.email}</div></div>
+      <div style={{borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:"14px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:"9px",padding:"6px 10px",marginBottom:"8px"}}>
+          <div style={{width:"30px",height:"30px",background:"linear-gradient(135deg,#7c3aed,#2563eb)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontWeight:"700",fontSize:"12px",flexShrink:0}}>{user.name[0].toUpperCase()}</div>
+          <div style={{overflow:"hidden"}}><div style={{color:"white",fontSize:"12px",fontWeight:"700",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{user.name}</div><div style={{color:"rgba(255,255,255,0.35)",fontSize:"10px"}}>{user.email}</div></div>
         </div>
-        <button onClick={logout} style={{width:"100%",padding:"8px",background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.18)",borderRadius:"7px",color:"#f87171",fontSize:"12px",cursor:"pointer"}}>Sign Out</button>
+        <button onClick={logout} style={{width:"100%",padding:"9px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.22)",borderRadius:"8px",color:"#fca5a5",fontSize:"12px",fontWeight:"600",cursor:"pointer",transition:"all 0.2s"}}>Sign Out</button>
       </div>
     </div>
   );
@@ -815,6 +835,43 @@ function StressRelief({user,onActivityComplete,onEditInterests}){
   const[editingSub,setEditingSub]=useState(null);
   const[subInterests,setSubInterests]=useState(()=>user.subInterests||{});
 
+  // ── 4-4-4-4 Box Breathing State ─────────────────────────────────────────
+  const [breathingActive, setBreathingActive] = useState(false);
+  const [breathPhaseIndex, setBreathPhaseIndex] = useState(0); // 0: Inhale, 1: Hold, 2: Exhale, 3: Hold
+  const [breathSeconds, setBreathSeconds] = useState(4);
+  const [cyclesCompleted, setCyclesCompleted] = useState(0);
+
+  const BREATH_PHASES = [
+    { label: "Inhale Slowly", hint: "Breathe in deeply through your nose", color: "#8b5cf6", scale: 1.45 },
+    { label: "Hold Breath", hint: "Retain gently with calm awareness", color: "#38bdf8", scale: 1.45 },
+    { label: "Exhale Gently", hint: "Release all tension smoothly through your mouth", color: "#4ade80", scale: 1.0 },
+    { label: "Rest & Pause", hint: "Stay relaxed and still before the next breath", color: "#a855f7", scale: 1.0 },
+  ];
+
+  useEffect(() => {
+    if (!breathingActive) return;
+    const interval = setInterval(() => {
+      setBreathSeconds(s => {
+        if (s <= 1) {
+          setBreathPhaseIndex(p => {
+            const next = (p + 1) % 4;
+            if (next === 0) {
+              setCyclesCompleted(c => {
+                const newC = c + 1;
+                onActivityComplete({ date: new Date().toISOString(), interestKey: "mindfulness", resourceTitle: `Box Breathing (Cycle #${newC})` });
+                return newC;
+              });
+            }
+            return next;
+          });
+          return 4;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [breathingActive, onActivityComplete]);
+
   const interests=user.interests||[];
   const matched=interests.filter(i=>INTEREST_RESOURCES[i]);
 
@@ -974,6 +1031,115 @@ function StressRelief({user,onActivityComplete,onEditInterests}){
         <div style={{textAlign:"center",flexShrink:0}}>
           <div style={{color:"#4ade80",fontSize:"28px",fontWeight:"900"}}>{todayCompleted}</div>
           <div style={{color:"rgba(255,255,255,0.3)",fontSize:"10px"}}>today</div>
+        </div>
+      </div>
+
+      {/* 4-4-4-4 Box Breathing Sanctuary */}
+      <div style={{
+        background: "linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.05) 50%, rgba(16, 185, 129, 0.04) 100%)",
+        border: "1px solid rgba(139, 92, 246, 0.22)",
+        borderRadius: "16px",
+        padding: "20px 24px",
+        marginBottom: "22px",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.25)",
+        backdropFilter: "blur(12px)",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"16px"}}>
+          {/* Left: Interactive Breathing Orb */}
+          <div style={{display:"flex",alignItems:"center",gap:"22px"}}>
+            <div style={{
+              width:"90px",
+              height:"90px",
+              borderRadius:"50%",
+              display:"flex",
+              alignItems:"center",
+              justifyContent:"center",
+              position:"relative",
+              flexShrink:0
+            }}>
+              {/* Outer Ripple */}
+              <div style={{
+                position:"absolute",
+                inset:0,
+                borderRadius:"50%",
+                background: `radial-gradient(circle, ${BREATH_PHASES[breathPhaseIndex].color}40 0%, transparent 70%)`,
+                animation: breathingActive ? "boxBreathe 16s ease-in-out infinite" : "none",
+                transform: breathingActive ? undefined : "scale(1)",
+                transition: "all 0.6s ease"
+              }}/>
+              {/* Inner Glowing Core */}
+              <div style={{
+                width:"58px",
+                height:"58px",
+                borderRadius:"50%",
+                background: `linear-gradient(135deg, ${BREATH_PHASES[breathPhaseIndex].color}, #6366f1)`,
+                boxShadow: `0 0 25px ${BREATH_PHASES[breathPhaseIndex].color}80`,
+                display:"flex",
+                alignItems:"center",
+                justifyContent:"center",
+                zIndex:1,
+                transition: "all 0.5s ease"
+              }}>
+                <span style={{fontSize:"20px"}}>{breathingActive ? (breathPhaseIndex === 0 ? "🌬️" : breathPhaseIndex === 1 ? "🧘" : breathPhaseIndex === 2 ? "💨" : "✨") : "🫁"}</span>
+              </div>
+            </div>
+
+            {/* Instruction and Stage */}
+            <div>
+              <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"4px"}}>
+                <span style={{color: BREATH_PHASES[breathPhaseIndex].color, fontSize:"11px", fontWeight:"800", textTransform:"uppercase", letterSpacing:"1.2px"}}>
+                  {breathingActive ? `Phase ${breathPhaseIndex + 1}/4` : "Vagus Nerve Reset"}
+                </span>
+                {breathingActive && (
+                  <span style={{background: `${BREATH_PHASES[breathPhaseIndex].color}22`, color: BREATH_PHASES[breathPhaseIndex].color, border: `1px solid ${BREATH_PHASES[breathPhaseIndex].color}44`, borderRadius: "999px", padding: "1px 8px", fontSize: "11px", fontWeight: "800"}}>
+                    {breathSeconds}s
+                  </span>
+                )}
+              </div>
+              <h3 style={{color:"white",fontSize:"17px",fontWeight:"800",margin:0}}>
+                {breathingActive ? BREATH_PHASES[breathPhaseIndex].label : "Guided 4-4-4-4 Box Breathing"}
+              </h3>
+              <p style={{color:"rgba(255,255,255,0.45)",fontSize:"12px",marginTop:"3px",maxWidth:"380px",lineHeight:"1.4"}}>
+                {breathingActive ? BREATH_PHASES[breathPhaseIndex].hint : "4s Inhale, 4s Hold, 4s Exhale, 4s Rest to immediately lower somatic tension and soothe cortisol."}
+              </p>
+            </div>
+          </div>
+
+          {/* Right: Controls & Metrics */}
+          <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
+            <div style={{textAlign:"right",paddingRight:"12px",borderRight:"1px solid rgba(255,255,255,0.08)"}}>
+              <div style={{color:"#4ade80",fontSize:"18px",fontWeight:"800"}}>{cyclesCompleted}</div>
+              <div style={{color:"rgba(255,255,255,0.35)",fontSize:"10px",textTransform:"uppercase"}}>Cycles Done</div>
+            </div>
+            <button
+              onClick={() => {
+                if (!breathingActive) {
+                  setBreathPhaseIndex(0);
+                  setBreathSeconds(4);
+                }
+                setBreathingActive(b => !b);
+              }}
+              style={{
+                padding:"10px 18px",
+                background: breathingActive ? "rgba(239, 68, 68, 0.16)" : "linear-gradient(135deg, #8b5cf6, #3b82f6)",
+                border: breathingActive ? "1px solid rgba(239, 68, 68, 0.4)" : "none",
+                borderRadius:"10px",
+                color: breathingActive ? "#f87171" : "white",
+                fontSize:"12px",
+                fontWeight:"700",
+                cursor:"pointer",
+                display:"flex",
+                alignItems:"center",
+                gap:"6px",
+                boxShadow: breathingActive ? "none" : "0 4px 15px rgba(139, 92, 246, 0.35)",
+                transition: "all 0.2s ease"
+              }}
+            >
+              {breathingActive ? "⏸ Pause Breathing" : "▶ Start Breathing"}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1306,7 +1472,7 @@ export default function Deprex(){
   const baseRisk=latestAssess?computeRisk(latestAssess.score,avgSent,journals.length):0.15;
   const risk=Math.min(0.97,Math.max(0.03,baseRisk+chatRiskDelta-activityBonus));
 
-  const bg={minHeight:"100vh",background:"radial-gradient(ellipse at 20% 10%, #1a0a2e 0%, #0a0a14 45%, #091220 100%)",color:"white",fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"};
+  const bg={minHeight:"100vh",background:"radial-gradient(ellipse at 25% 15%, rgba(139, 92, 246, 0.12) 0%, #080811 50%, #0a1120 100%)",color:"white",fontFamily:"'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"};
 
   if(loading) return(
     <div style={{...bg,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:"16px"}}>
