@@ -16,12 +16,28 @@ class GeminiAdapter(IntelligenceProvider):
     def __init__(
         self,
         api_key: str,
-        model: str = "gemini-2.5-flash",
+        model: str = "gemini-3.6-flash",
     ):
         if not api_key:
             raise ValueError("GeminiAdapter requires a non-empty api_key.")
         self.client = genai.Client(api_key=api_key)
         self.model = model
+
+    async def _generate_with_fallback(self, **kwargs):
+        candidates = [self.model] + [m for m in ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"] if m != self.model]
+        last_error = None
+        for m in candidates:
+            try:
+                kwargs["model"] = m
+                return await self.client.aio.models.generate_content(**kwargs)
+            except Exception as e:
+                last_error = e
+                err_msg = str(e).lower()
+                if "404" in err_msg or "not found" in err_msg or "no longer available" in err_msg:
+                    logger.warning("Gemini model %s unavailable, trying next candidate: %s", m, e)
+                    continue
+                raise
+        raise last_error
 
     async def generate_companion_reply(
         self,
@@ -62,8 +78,7 @@ class GeminiAdapter(IntelligenceProvider):
             )
 
         try:
-            response = await self.client.aio.models.generate_content(
-                model=self.model,
+            response = await self._generate_with_fallback(
                 contents=formatted_contents,
                 config=types.GenerateContentConfig(
                     system_instruction=system_instruction,
@@ -83,8 +98,7 @@ class GeminiAdapter(IntelligenceProvider):
         )
 
         try:
-            response = await self.client.aio.models.generate_content(
-                model=self.model,
+            response = await self._generate_with_fallback(
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -123,8 +137,7 @@ class GeminiAdapter(IntelligenceProvider):
         )
 
         try:
-            response = await self.client.aio.models.generate_content(
-                model=self.model,
+            response = await self._generate_with_fallback(
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
